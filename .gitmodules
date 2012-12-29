@@ -1,0 +1,3 @@
+[submodule "hausbus2"]
+	path = hausbus2
+	url = https://github.com/raumzeitlabor/hausbus2-python
