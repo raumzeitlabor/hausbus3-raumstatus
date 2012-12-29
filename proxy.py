@@ -20,24 +20,35 @@ def kthxbye(people):
 	for person in people:
 		print "KTHXBYE " + person
 
-f = urlopen("http://status.raumzeitlabor.de/api/stream/full.json")
+# start the Hausbus2 server on port 8080
+hausbus2.start("raumstatus-proxy", http_port=8080, mqtt_broker = "127.0.0.1")
 
 laboranten = []
 laboranten_old = []
 
-for line in f: 
-	if line == "\r\n": # KeepAlive-Package only
-		continue
+try:
+	f = urlopen("http://status.raumzeitlabor.de/api/stream/full.json")
 	
-	laboranten_old = laboranten
-	laboranten = json.loads(line)["details"]["laboranten"]
-	
-	difference = set(laboranten).symmetric_difference(set(laboranten_old))
-	
-	if len(difference) > 0:
-		if len(laboranten) > len(laboranten_old):
-			ohai(difference)
-		elif len(laboranten) < len(laboranten_old):
-			kthxbye(difference)
-
-
+	for line in f: 
+		if line == "\r\n": # KeepAlive-Package only
+			continue
+		data = json.loads(line)
+		
+		hausbus2.update("raumstatus","tuer",data["details"]["tuer"], False)
+		hausbus2.update("raumstatus","geraete",data["details"]["geraete"], False)
+		hausbus2.update("raumstatus","laboranten",data["details"]["laboranten"])
+		
+		laboranten_old = laboranten
+		laboranten = data["details"]["laboranten"]
+		
+		difference = set(laboranten).symmetric_difference(set(laboranten_old))
+		
+		if len(difference) > 0:
+			if len(laboranten) > len(laboranten_old):
+				ohai(difference)
+			elif len(laboranten) < len(laboranten_old):
+				kthxbye(difference)
+except KeyboardInterrupt:
+	print '^C received, shutting down server'
+finally:
+	hausbus2.stop()
