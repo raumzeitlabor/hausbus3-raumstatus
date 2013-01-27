@@ -2,11 +2,11 @@
 
 import os, sys
 original_path = os.path.dirname(os.path.realpath(os.path.abspath(sys.argv[0])))
-lib_path = original_path + '/hausbus2'
+lib_path = original_path + '/hausbus3'
 sys.path.append(lib_path)
 
 import json
-import hausbus2
+import hausbus3
 from urllib2 import urlopen
 
 import socket
@@ -20,8 +20,8 @@ def kthxbye(people):
 	for person in people:
 		print "KTHXBYE " + person
 
-# start the Hausbus2 server on port 8080
-hausbus2.start("raumstatus-proxy", http_port=8080, mqtt_broker = "127.0.0.1")
+# start the Hausbus3 server on port 8080
+hausbus3.start("raumstatus-proxy", http_port=8080, mqtt_broker = "127.0.0.1")
 
 laboranten = []
 laboranten_old = []
